@@ -179,7 +179,7 @@ class WebDavDriver extends AbstractHierarchicalFilesystemDriver {
 		$settings = array();
 		if ($this->configuration['useAuthentication']) {
 			$this->username = $urlInfo['user'] ? $urlInfo['user'] : $this->configuration['username'];
-			$this->password = $urlInfo['pass'] ? $urlInfo['pass'] : EncryptionUtility::decryptPassword($this->configuration['password']);
+			$this->password = $urlInfo['pass'] ? $urlInfo['pass'] : $this->configuration['password']; //EncryptionUtility::decryptPassword($this->configuration['password']);
 			$settings = array(
 				'userName' => $this->username,
 				'password' => $this->password
@@ -974,4 +974,27 @@ class WebDavDriver extends AbstractHierarchicalFilesystemDriver {
 		return count($this->getFrontend()->listFolders($folderIdentifier));
 	}
 
+    /**
+     * Returns the identifier of a file inside the folder
+     *
+     * @param string $fileName
+     * @param string $folderIdentifier
+     * @return string file identifier
+     */
+    public function getFileInFolder($fileName, $folderIdentifier)
+    {
+        // TODO: Implement getFileInFolder() method.
+    }
+
+    /**
+     * Returns the identifier of a folder inside the folder
+     *
+     * @param string $folderName The name of the target folder
+     * @param string $folderIdentifier
+     * @return string folder identifier
+     */
+    public function getFolderInFolder($folderName, $folderIdentifier)
+    {
+        // TODO: Implement getFolderInFolder() method.
+    }
 }

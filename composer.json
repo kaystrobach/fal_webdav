@@ -1,0 +1,26 @@
+{
+	"name": "KayStrobach/falWebdav",
+	"type": "typo3-cms-extension",
+	"description": "includes the fal webdav storage",
+	"homepage": "http://www.kay-strobach.de",
+	"keywords": ["TYPO3 CMS", "foo bar"],
+	"license": ["GPL-2.0+"],
+	"version": "0.0.0",
+	"require": {
+		"typo3/cms-core": ">=7.0.0,<8.0"
+	},
+	"support": {
+    	},
+	"autoload": {
+		"psr-4": {
+			"TYPO3\\FalWebdav\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"TYPO3\\FalWebdav\\": "Classes/",
+			"TYPO3\\CMS\\Core\\Tests\\": "../../typo3/sysext/core/Tests/",
+			"TYPO3\\CMS\\Fluid\\Tests\\": "../../typo3/sysext/fluid/Tests/"
+		}
+	}
+}

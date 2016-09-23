@@ -6,6 +6,16 @@
 	<ROOT>
 		<type>array</type>
 		<el>
+			<warning>
+				<TCEforms>
+					<label>Warning</label>
+					<config>
+						<type>user</type>
+						<userFunc>TYPO3\FalWebdav\Backend\McryptWizard->main</userFunc>
+					</config>
+					<displayCond>USER:TYPO3\FalWebdav\Backend\McryptWizard->isNotInstalled</displayCond>
+				</TCEforms>
+			</warning>
 			<baseUrl>
 				<TCEforms>
 					<label>WebDAV URL:</label>
@@ -31,6 +41,7 @@
 					<config>
 						<type>check</type>
 					</config>
+					<displayCond>USER:TYPO3\FalWebdav\Backend\McryptWizard->isInstalled</displayCond>
 				</TCEforms>
 			</useAuthentication>
 			<username>
@@ -41,6 +52,7 @@
 						<default>username</default>
 						<size>30</size>
 					</config>
+					<displayCond>USER:TYPO3\FalWebdav\Backend\McryptWizard->isInstalled</displayCond>
 				</TCEforms>
 			</username>
 			<password>
@@ -51,6 +63,7 @@
 						<eval>password</eval>
 						<size>30</size>
 					</config>
+					<displayCond>USER:TYPO3\FalWebdav\Backend\McryptWizard->isInstalled</displayCond>
 				</TCEforms>
 			</password>
 		</el>

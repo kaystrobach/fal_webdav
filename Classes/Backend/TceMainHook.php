@@ -41,8 +41,7 @@ class TceMainHook {
 			return;
 		}
 
-		// @todo reenable encryption
-		//$password = \TYPO3\FalWebdav\Utility\EncryptionUtility::encryptPassword($password);
+		$password = \TYPO3\FalWebdav\Utility\EncryptionUtility::encryptPassword($password);
 	}
 
 }

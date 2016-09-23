@@ -17,12 +17,16 @@ namespace TYPO3\FalWebdav\Driver;
 include_once __DIR__ . '/../../Resources/Composer/vendor/autoload.php';
 
 use Sabre\DAV;
+use Sabre\HTTP\ClientException;
+use Sabre\HTTP\ClientHttpException;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Resource\Driver\AbstractDriver;
 use TYPO3\CMS\Core\Resource\Driver\AbstractHierarchicalFilesystemDriver;
+use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\Exception\FileOperationErrorException;
 use TYPO3\CMS\Core\Resource\Exception\FolderDoesNotExistException;
+use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
@@ -179,7 +183,7 @@ class WebDavDriver extends AbstractHierarchicalFilesystemDriver {
 		$settings = array();
 		if ($this->configuration['useAuthentication']) {
 			$this->username = $urlInfo['user'] ? $urlInfo['user'] : $this->configuration['username'];
-			$this->password = $urlInfo['pass'] ? $urlInfo['pass'] : $this->configuration['password']; //EncryptionUtility::decryptPassword($this->configuration['password']);
+			$this->password = $urlInfo['pass'] ? $urlInfo['pass'] : EncryptionUtility::decryptPassword($this->configuration['password']);
 			$settings = array(
 				'userName' => $this->username,
 				'password' => $this->password
@@ -949,17 +953,28 @@ class WebDavDriver extends AbstractHierarchicalFilesystemDriver {
 	 */
 	public function getFoldersInFolder($folderIdentifier, $start = 0, $numberOfItems = 0, $recursive = FALSE,
 	                                   array $folderNameFilterCallbacks = array(), $sort = '', $sortRev = FALSE) {
-		$folders = $this->getFrontend()->listFolders($folderIdentifier);
+		try {
+            $folders = $this->getFrontend()->listFolders($folderIdentifier);
 
-		// TODO implement sorting
+            // TODO implement sorting
 
-		$items = array();
-		foreach ($folders as $name) {
-			$items[$name] = $folderIdentifier . $name . '/';
-		}
-
-		return $items;
-	}
+            $items = array();
+            foreach ($folders as $name) {
+                $items[$name] = $folderIdentifier . $name . '/';
+            }
+            return $items;
+        } catch (ClientHttpException $e) {
+            $this->logger->critical(
+                'Cannot list items in directory ' . $folderIdentifier . ' - Storage:' . $this->storageUid . ' - ' . $e->getMessage()
+            );
+            return array();
+        } catch (ClientException $e) {
+            $this->logger->critical(
+                'Cannot list items in directory ' . $folderIdentifier . ' - Storage:' . $this->storageUid . ' - ' . $e->getMessage()
+            );
+            return array();
+        }
+    }
 
 	/**
 	 * Returns the number of folders inside the specified path
@@ -980,10 +995,18 @@ class WebDavDriver extends AbstractHierarchicalFilesystemDriver {
      * @param string $fileName
      * @param string $folderIdentifier
      * @return string file identifier
+     * @throws FileDoesNotExistException
      */
     public function getFileInFolder($fileName, $folderIdentifier)
     {
-        // TODO: Implement getFileInFolder() method.
+        $files = $this->getFilesInFolder($folderIdentifier);
+        if (!array_key_exists($fileName, $files)) {
+             throw new FileDoesNotExistException(
+                 $fileName . 'does not exist in ' . $folderIdentifier,
+                 1474629253
+             );
+        }
+        return $files[$fileName];
     }
 
     /**
@@ -992,9 +1015,17 @@ class WebDavDriver extends AbstractHierarchicalFilesystemDriver {
      * @param string $folderName The name of the target folder
      * @param string $folderIdentifier
      * @return string folder identifier
+     * @throws FolderDoesNotExistException
      */
     public function getFolderInFolder($folderName, $folderIdentifier)
     {
-        // TODO: Implement getFolderInFolder() method.
+        $folders = $this->getFoldersInFolder($folderIdentifier);
+        if (!array_key_exists($folderName, $folders)) {
+            throw new FolderDoesNotExistException(
+                $folderName . 'does not exist in ' . $folderIdentifier,
+                1474629253
+            );
+        }
+        return $folders[$folderName];
     }
 }
